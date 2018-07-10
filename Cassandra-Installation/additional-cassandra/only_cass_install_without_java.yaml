@@ -1,0 +1,22 @@
+--- # Installs only Cassandra without Java
+- hosts: '{{ servers }}'
+  remote_user: ansible
+  become: yes
+  become_method: sudo
+  connection: ssh
+  gather_facts: yes
+  tasks:
+  - name: Add Cassandra Repository
+    shell: "echo 'deb http://debian.datastax.com/community stable main' | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list"
+  - name: Add Secondary Cassandra Repository
+    shell: "echo 'deb-src http://www.apache.org/dist/cassandra/debian 22x main' | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list"
+  - name: Add Keys
+    shell: "wget http://debian.datastax.com/debian/repo_key"
+  - name: Adding Keys
+    shell: "apt-key add repo_key"
+  - name: Add Additional Keys That Are Needed
+    shell: "curl https://www.apache.org/dist/cassandra/KEYS | apt-key add -"
+  - name: Update Packages One More Time
+    shell: "apt-get -y update"
+  - name: Install Cassandra
+    shell: "apt-get -y install dsc22=2.2.3-1 cassandra=2.2.3"

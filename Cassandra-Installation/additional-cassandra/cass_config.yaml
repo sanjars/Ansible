@@ -1,0 +1,25 @@
+--- # Changing configuration file for Cassandra. Brief file to change settings inside Cassandra config file.
+- hosts: '{{servers}}'
+  remote_user: ansible
+  become: yes
+  become_method: sudo
+  connection: ssh
+  gather_facts: yes
+  tasks:
+  - name: Editing listen_address value inside cassandra config
+    shell: "sed -i '429s/localhost/''{{IP}}''/' /etc/cassandra/cassandra.yaml"
+  
+  - name: Editing /etc/init.d/cassandra
+    shell: "sed -i 's/cassandra.+CassandraDaemon/cassandra/' /etc/init.d/cassandra"
+  
+  - name: Setting rpc_address value to 0.0.0.0
+    shell: "sed -i '487s/localhost/0.0.0.0/' /etc/cassandra/cassandra.yaml"    
+  
+  - name: Uncommenting broadcast_rpc_address
+    shell: "sed -i '498s/^#//' /etc/cassandra/cassandra.yaml"
+  
+  - name: Adding IP address to broadcast_rpc_address
+    shell: "sed -i '498s/1.2.3.4/''{{IP}}''/' /etc/cassandra/cassandra.yaml"
+  
+  - name: Remove whitespace in front of broadcast_rpc_address
+    shell: "sed -i '498s/^ *//' /etc/cassandra/cassandra.yaml"

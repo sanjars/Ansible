@@ -1,0 +1,19 @@
+--- # Cassandra Cluster Configuration
+- hosts: '{{ target }}'
+  remote_user: ansible
+  become: yes
+  become_method: sudo
+  connection: ssh
+  gather_facts: yes
+  tasks:
+  - name: Changing cluster name
+    shell: "sed -i 's/Test Cluster/''{{cluster_name}}''/' /etc/cassandra/cassandra.yaml"
+  
+  - name: Setting Cluster IPs
+    shell: "sed -i '315s/127.0.0.1/''{{cluster_ips}}''/' /etc/cassandra/cassandra.yaml"
+
+  - name: Changing endpoint snitch value
+    shell: "sed -i 's/SimpleSnitch/GossipingPropertyFileSnitch/' /etc/cassandra/cassandra.yaml"
+
+  - name: Adding auto_bootstrap value as false
+    shell: 'echo "auto_bootstrap: false" >> /etc/cassandra/cassandra.yaml'
